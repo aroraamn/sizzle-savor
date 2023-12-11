@@ -1,0 +1,62 @@
+const menuItems = [
+  {name: "Angus Burger", price: 8.99, category: 'burger', image: 'https://kitchenatics.com/wp-content/uploads/2020/08/Two-homemade-beef-burgers-1.jpg'},
+  {name: "Tuna Steak Burger", price: 15.00, category: 'burger', image: 'https://food.fnr.sndimg.com/content/dam/images/food/fullset/2019/6/18/0/KC2109_Tuna-Steak-Burgers_s4x3.jpg.rend.hgtvcom.616.462.suffix/1560899443986.jpeg'},
+  {name: "Bacon Burger", price: 11.50, category: 'burger', image: 'https://makeyourmeals.com/wp-content/uploads/2020/05/bacon-cheeseburger-featured-720x540.jpg'},
+  {name: "Southwest Chicken Burger", price: 9.99, category: 'burger', image: 'https://www.sargento.com/assets/Uploads/Recipe/Image/smashburger__FillWzExNzAsNTgzXQ.jpg'},
+  {name: "Mozzarella Burger", price: 12.50, category: 'burger', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzlvbLmXlgnaZWr2W14tu2ATK7ZXm8zcOwBg&usqp=CAU'},
+  {name: "Cesar Salad", price: 6.50, category: 'salad', image: 'https://assets.bonappetit.com/photos/624215f8a76f02a99b29518f/1:1/w_2800,h_2800,c_limit/0328-ceasar-salad-lede.jpg'},
+  {name: "BBQ Chicken Salad", price: 13.99, category: 'salad', image: 'https://s23209.pcdn.co/wp-content/uploads/2014/01/IMG_1819edit-1.jpg'},
+  {name: "Garden Salad", price: 9.99, category: 'salad', image: 'https://www.tasteofhome.com/wp-content/uploads/2018/01/Armenian-Garden-Salad_exps47594_TH2236620A05_31_3bC_RMS.jpg?fit=700,1024'},
+  {name: "Veggie Lasagna", price: 17.99, category: 'pasta', image: 'https://myfoodstory.com/wp-content/uploads/2019/11/Easy-Vegetarian-Lasagna-5.jpg'},
+  {name: "Spaghetti & Meatballs", price: 17.99, category: 'pasta', image: 'https://static.onecms.io/wp-content/uploads/sites/43/2022/04/07/21353-italian-spaghetti-sauce-with-meatballs-3x2-138.jpg'},
+  {name: "Fettuccine Alfredo", price: 17.99, category: 'pasta', image: 'https://media.olivegarden.com/en_us/images/product/classic-fettuccine-alfredo-dinner-dpv-590x365.jpg'},
+];
+
+intent('show me the menu', p => {
+    p.play({command:'getMenu', data:menuItems});
+    p.play("here's the menu");
+})
+
+intent('order by $(ORDER_BY name|category|price|image)', p => {
+  
+    
+    const orderByField = p.ORDER_BY.value;
+    let orderedMenuItems = menuItems;
+    
+    switch(orderByField){
+        case 'name':
+            orderedMenuItems=menuItems.sort((p1,p2)=>p1.name.localeCompare(p2.name));
+            break;
+        case 'category':
+            orderedMenuItems=menuItems.sort((p1,p2)=>p1.category.localeCompare(p2.category));
+            break;
+        case 'image':
+            orderedMenuItems=menuItems.sort((p1,p2)=>p1.image.localeCompare(p2.image));
+            break;
+        case 'price':
+            orderedMenuItems=menuItems.sort((p1,p2)=>p1.price-p2.price);
+    }
+    p.play({command:'getMenu',data:orderedMenuItems});
+    p.play(`ordering by ${p.ORDER_BY.value}`)
+    
+    
+})
+
+const menuItemsSlotList = menuItems.map(item=> item.name).join("|");
+
+intent(`Add $(ITEM ${menuItemsSlotList}) to the cart`,
+       'Add $(UNAVAILABLE_ITEM* .*) to the cart',
+        p=>{
+    if(p.UNAVAILABLE_ITEM){
+        p.play(`This item is not avaliable`);
+    }else{
+        
+        const ItemName = p.ITEM.value;
+        const itemsToGoInCart = menuItems.find(menuItem=>{
+            return menuItem.name.toLowerCase()===ItemName.toLowerCase();
+        })
+        p.play({command:'addToCart', data:itemsToGoInCart})
+        p.play(`Adding ${p.ITEM.value} to the cart`);
+    }
+    
+})

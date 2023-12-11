@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    background: url("background.png")  no-repeat fixed ;
+    background-size: cover;
+   
+}
+.cards{
+    display:list-item;
+    display:inline-block;
+   
+}
+.menuHeading{
+    width: 570px;
+    border: 1px solid rgb(255, 255, 255);
+    background-color: #435585;
+}
+.cartHeading{
+    width: 505px;
+    border: 1px solid rgb(255, 255, 255);
+    background-color: #818FB4;
+   
+
+}
+.listItems{
+    border: 1px solid black;
+}
